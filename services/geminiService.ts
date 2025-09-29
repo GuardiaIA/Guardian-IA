@@ -17,6 +17,7 @@ const fileToGenerativePart = async (file: File) => {
   };
 };
 
+// FIX: Per coding guidelines, the API key must be sourced from `process.env.API_KEY`. This change also resolves the error on `import.meta.env`.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const safetyReportSchema = {

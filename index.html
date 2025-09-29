@@ -7,31 +7,31 @@
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#2563eb">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/192/1086/1086433.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.1.1/",
     "react": "https://aistudiocdn.com/react@^19.1.1",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.21.0",
-    "jspdf": "https://aistudiocdn.com/jspdf@^3.0.3"
+    "jspdf": "https://aistudiocdn.com/jspdf@^3.0.3",
+    "vite": "https://aistudiocdn.com/vite@^7.1.7",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.0.4"
   }
 }
 </script>
 </head>
 <body class="bg-slate-100">
     <div id="root"></div>
-    <script type="module" src="index.tsx"></script>
+    <script type="module" src="/index.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js').then(registration => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
           }, err => {
             console.log('ServiceWorker registration failed: ', err);

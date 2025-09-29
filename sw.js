@@ -1,36 +1,15 @@
 // sw.js - Service Worker for PWA
 
 const CACHE_NAME = 'guardian-ia-cache-v1';
+// NOTE: Caching source files (.ts, .tsx) is not effective with Vite.
+// For a production-ready PWA, a plugin like 'vite-plugin-pwa' is recommended
+// to automatically generate a service worker that caches the final bundled assets.
 const urlsToCache = [
   './',
   './index.html',
-  './index.tsx',
-  './App.tsx',
-  './types.ts',
-  './constants.ts',
-  './metadata.json',
-  './services/geminiService.ts',
-  './components/Header.tsx',
-  './components/LoginView.tsx',
-  './components/NavBar.tsx',
-  './components/ScanView.tsx',
-  './components/HistoryView.tsx',
-  './components/ReportView.tsx',
-  './components/ChemicalGuideView.tsx',
-  './components/UserManagementView.tsx',
-  './components/UserGuideView.tsx',
-  './components/CameraView.tsx',
-  './data/users.ts',
-  './data/mockReports.ts',
   './manifest.json',
   // External resources from CDNs
   'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-  'https://aistudiocdn.com/react@^19.1.1',
-  'https://aistudiocdn.com/react-dom@^19.1.1/',
-  'https://aistudiocdn.com/@google/genai@^1.21.0',
-  'https://aistudiocdn.com/jspdf@^3.0.3',
   // Placeholder Icons from manifest
   'https://cdn-icons-png.flaticon.com/192/1086/1086433.png',
   'https://cdn-icons-png.flaticon.com/512/1086/1086433.png'
