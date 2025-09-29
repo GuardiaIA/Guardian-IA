@@ -1,0 +1,96 @@
+
+import { GoogleGenAI, Type } from "@google/genai";
+import { ReportData, RiskLevel } from "../types";
+
+const fileToGenerativePart = async (file: File) => {
+  const base64EncodedDataPromise = new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result.split(',')[1]);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  return {
+    inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
+  };
+};
+
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+const safetyReportSchema = {
+    type: Type.OBJECT,
+    properties: {
+        riskLevel: {
+            type: Type.STRING,
+            // FIX: Using direct string values for the enum to ensure schema correctness.
+            enum: ["Verde", "Amarillo", "Rojo"],
+            description: "Clasificación del riesgo: Verde (Seguro), Amarillo (Precaución), Rojo (Peligro)."
+        },
+        anomalyDescription: {
+            type: Type.STRING,
+            description: "Descripción detallada de todas las anomalías y riesgos de seguridad identificados para el personal de servicio (limpieza, mantenimiento)."
+        },
+        ppeRecommendation: {
+            type: Type.STRING,
+            description: "Listado detallado del Equipamiento de Protección Personal (EPP) requerido para realizar tareas de forma segura."
+        },
+        infrastructureSuggestion: {
+            type: Type.STRING,
+            description: "Sugerencias para reparaciones o mejoras de infraestructura a largo plazo para eliminar los riesgos."
+        },
+        legalReference: {
+            type: Type.STRING,
+            description: "Cita de los artículos, capítulos o secciones pertinentes de las leyes argentinas 19.587 y 24.557 que fundamentan el análisis."
+        }
+    },
+    required: ["riskLevel", "anomalyDescription", "ppeRecommendation", "infrastructureSuggestion", "legalReference"]
+};
+
+export const analyzeImageForSafety = async (imageFile: File, location: string): Promise<ReportData> => {
+    try {
+        const imagePart = await fileToGenerativePart(imageFile);
+
+        const prompt = `
+        Actúa como 'Guarían IA', un experto en seguridad e higiene laboral en Argentina. Tu análisis debe basarse en la imagen provista y cumplir estrictamente con las leyes argentinas: Ley 19.587 (Higiene y Seguridad) y Ley 24.557 (Riesgos del Trabajo).
+        El objetivo es identificar riesgos para el personal no docente (mantenimiento, limpieza) en la ubicación: "${location}".
+
+        Analiza la imagen adjunta y genera un informe de riesgo profesional. Identifica todas las anomalías de seguridad visibles.
+        
+        Debes devolver únicamente un objeto JSON válido con la siguiente estructura:
+        - riskLevel: Clasificación del riesgo general (Verde, Amarillo, o Rojo).
+        - anomalyDescription: Descripción detallada de los peligros.
+        - ppeRecommendation: EPP recomendado.
+        - infrastructureSuggestion: Sugerencias de mejora.
+        - legalReference: Citas legales específicas de las leyes mencionadas que justifiquen el riesgo.
+        `;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: [{ parts: [{ text: prompt }, imagePart] }],
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: safetyReportSchema,
+                temperature: 0.2
+            }
+        });
+
+        const jsonString = response.text.trim();
+        const reportData = JSON.parse(jsonString);
+
+        // FIX: Refactored riskLevel validation for clarity and type safety.
+        // Ensure the riskLevel from the API response is a valid RiskLevel enum member
+        const apiRiskLevel = reportData.riskLevel;
+        if (!Object.values(RiskLevel).includes(apiRiskLevel)) {
+            console.warn(`Received invalid riskLevel: ${apiRiskLevel}. Defaulting to Amarillo.`);
+            reportData.riskLevel = RiskLevel.Amarillo;
+        }
+
+        return reportData as ReportData;
+
+    } catch (error) {
+        console.error("Error analyzing image with Gemini:", error);
+        throw new Error("No se pudo analizar la imagen. Verifique la clave de API y la imagen subida.");
+    }
+};

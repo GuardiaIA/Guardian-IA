@@ -1,0 +1,24 @@
+{
+  "short_name": "Guardián IA",
+  "name": "Guardián IA: Análisis de Riesgos Laborales",
+  "description": "Aplicación de IA para el análisis de seguridad en espacios de trabajo, generando informes de riesgo profesionales para prevenir accidentes.",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/192/1086/1086433.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1086/1086433.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#f1f5f9",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#2563eb"
+}
