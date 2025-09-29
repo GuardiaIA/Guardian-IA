@@ -3,26 +3,26 @@
 const CACHE_NAME = 'guardian-ia-cache-v1';
 const urlsToCache = [
   './',
-  'index.html',
-  'index.tsx',
-  'App.tsx',
-  'types.ts',
-  'constants.ts',
-  'metadata.json',
-  'services/geminiService.ts',
-  'components/Header.tsx',
-  'components/LoginView.tsx',
-  'components/NavBar.tsx',
-  'components/ScanView.tsx',
-  'components/HistoryView.tsx',
-  'components/ReportView.tsx',
-  'components/ChemicalGuideView.tsx',
-  'components/UserManagementView.tsx',
-  'components/UserGuideView.tsx',
-  'components/CameraView.tsx',
-  'data/users.ts',
-  'data/mockReports.ts',
-  'manifest.json',
+  './index.html',
+  './index.tsx',
+  './App.tsx',
+  './types.ts',
+  './constants.ts',
+  './metadata.json',
+  './services/geminiService.ts',
+  './components/Header.tsx',
+  './components/LoginView.tsx',
+  './components/NavBar.tsx',
+  './components/ScanView.tsx',
+  './components/HistoryView.tsx',
+  './components/ReportView.tsx',
+  './components/ChemicalGuideView.tsx',
+  './components/UserManagementView.tsx',
+  './components/UserGuideView.tsx',
+  './components/CameraView.tsx',
+  './data/users.ts',
+  './data/mockReports.ts',
+  './manifest.json',
   // External resources from CDNs
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
@@ -54,6 +54,17 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // For navigation requests, always try the network first, then fall back to the cache's index.html.
+  // This helps prevent the service worker from serving a stale app shell.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match('./index.html');
+      })
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -64,8 +75,8 @@ self.addEventListener('fetch', (event) => {
 
         return fetch(event.request).then(
           (response) => {
-            // Check if we received a valid response
-            if(!response || response.status !== 200 || response.type !== 'basic') {
+            // Check if we received a valid response. We don't cache opaque responses (e.g. from no-cors requests)
+            if(!response || response.status !== 200 || response.type === 'opaque') {
               return response;
             }
 
@@ -77,15 +88,25 @@ self.addEventListener('fetch', (event) => {
 
             caches.open(CACHE_NAME)
               .then((cache) => {
-                cache.put(event.request, responseToCache);
+                // We only cache GET requests
+                if(event.request.method === 'GET') {
+                    cache.put(event.request, responseToCache);
+                }
               });
 
             return response;
           }
-        );
+        ).catch(err => {
+            // Network request failed, try to find a match in the cache as a fallback.
+            console.log('Fetch failed; returning offline page instead.', err);
+            // This could be a specific offline page if you have one.
+            // For now, it will just fail if not in cache.
+            return caches.match(event.request);
+        });
       })
     );
 });
+
 
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
@@ -94,6 +115,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
