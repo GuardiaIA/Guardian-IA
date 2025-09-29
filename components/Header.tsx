@@ -25,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
             {user.avatarUrl && <img
               className="h-10 w-10 rounded-full"
               src={user.avatarUrl}
-              alt="User avatar"
+              alt="Avatar de usuario"
             />}
             <button
               onClick={onLogout}

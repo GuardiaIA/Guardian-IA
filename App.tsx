@@ -28,7 +28,7 @@ const App: React.FC = () => {
         return {
           ...report,
           riskLevel: report.riskLevel as RiskLevel,
-          user: { id: 0, name: 'Unknown User', role: HierarchicalRole.PersonalDeServicio, dni: 'N/A', email: 'N/A' } // fallback user
+          user: { id: 0, name: 'Usuario Desconocido', role: HierarchicalRole.PersonalDeServicio, dni: 'N/A', email: 'N/A' } // fallback user
         };
       }
       return {
