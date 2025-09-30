@@ -77,8 +77,6 @@ export const analyzeImageForSafety = async (imageFile: File, location: string, a
             }
         });
         
-        // FIX: Use nullish coalescing operator (??) to provide a safe default ('')
-        // if response.text is null or undefined. This permanently resolves the TS18048 error.
         const jsonString = (response.text ?? '').trim();
         
         if (!jsonString) {
