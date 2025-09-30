@@ -76,12 +76,15 @@ export const analyzeImageForSafety = async (imageFile: File, location: string, a
                 temperature: 0.2
             }
         });
-
-        if (!response.text) {
-            throw new Error("La respuesta de la API no contenía texto. Intente de nuevo.");
+        
+        // FIX: Use nullish coalescing operator (??) to provide a safe default ('')
+        // if response.text is null or undefined. This permanently resolves the TS18048 error.
+        const jsonString = (response.text ?? '').trim();
+        
+        if (!jsonString) {
+            throw new Error("La respuesta de la API estaba vacía. Intente de nuevo.");
         }
         
-        const jsonString = response.text.trim();
         const reportData = JSON.parse(jsonString);
 
         const apiRiskLevel = reportData.riskLevel;
