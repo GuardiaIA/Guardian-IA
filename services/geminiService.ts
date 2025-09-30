@@ -77,7 +77,12 @@ export const analyzeImageForSafety = async (imageFile: File, location: string, a
             }
         });
 
-        const jsonString = response.text.trim();
+        const text = response.text;
+        if (!text) {
+            throw new Error("La respuesta de la API no contenía texto. Intente de nuevo.");
+        }
+        
+        const jsonString = text.trim();
         const reportData = JSON.parse(jsonString);
 
         const apiRiskLevel = reportData.riskLevel;
@@ -90,6 +95,9 @@ export const analyzeImageForSafety = async (imageFile: File, location: string, a
 
     } catch (error) {
         console.error("Error analyzing image with Gemini:", error);
+        if (error instanceof Error && error.message.includes("API key not valid")) {
+             throw new Error("La clave de API no es válida. Por favor, verifíquela.");
+        }
         throw new Error("No se pudo analizar la imagen. Verifique la clave de API y la imagen subida.");
     }
 };
