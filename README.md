@@ -44,7 +44,7 @@ Este proyecto se puede desplegar fácilmente como un sitio estático en GitHub P
     Suba todos los archivos del proyecto a su nuevo repositorio de GitHub.
 
 3.  **Construir el proyecto:**
-    Ejecute el siguiente comando localmente para generar los archivos estáticos para producción. Esto creará una carpeta `docs`.
+    Ejecute el siguiente comando localmente para generar los archivos estáticos para producción. Esto creará una carpeta `docs`. **Importante:** Si ya existe una carpeta `docs`, bórrela antes de ejecutar este comando para asegurar una compilación limpia.
     ```bash
     npm run build
     ```
