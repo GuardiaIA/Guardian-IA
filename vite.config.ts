@@ -7,9 +7,5 @@ export default defineConfig({
   base: '/guardian-ia/',
   build: {
     outDir: 'docs'
-  },
-  // This makes the environment variable available in the client-side code
-  define: {
-    'process.env.API_KEY': JSON.stringify(process.env.API_KEY)
   }
 })

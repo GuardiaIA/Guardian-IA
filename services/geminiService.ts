@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { ReportData, RiskLevel } from "../types";
 
@@ -17,15 +16,11 @@ const fileToGenerativePart = async (file: File) => {
   };
 };
 
-// FIX: Per coding guidelines, the API key must be sourced from `process.env.API_KEY`. This change also resolves the error on `import.meta.env`.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 const safetyReportSchema = {
     type: Type.OBJECT,
     properties: {
         riskLevel: {
             type: Type.STRING,
-            // FIX: Using direct string values for the enum to ensure schema correctness.
             enum: ["Verde", "Amarillo", "Rojo"],
             description: "Clasificación del riesgo: Verde (Seguro), Amarillo (Precaución), Rojo (Peligro)."
         },
@@ -49,7 +44,12 @@ const safetyReportSchema = {
     required: ["riskLevel", "anomalyDescription", "ppeRecommendation", "infrastructureSuggestion", "legalReference"]
 };
 
-export const analyzeImageForSafety = async (imageFile: File, location: string): Promise<ReportData> => {
+export const analyzeImageForSafety = async (imageFile: File, location: string, apiKey: string): Promise<ReportData> => {
+    if (!apiKey) {
+        throw new Error("La clave de API de Gemini no está configurada.");
+    }
+    const ai = new GoogleGenAI({ apiKey });
+
     try {
         const imagePart = await fileToGenerativePart(imageFile);
 
@@ -80,8 +80,6 @@ export const analyzeImageForSafety = async (imageFile: File, location: string): 
         const jsonString = response.text.trim();
         const reportData = JSON.parse(jsonString);
 
-        // FIX: Refactored riskLevel validation for clarity and type safety.
-        // Ensure the riskLevel from the API response is a valid RiskLevel enum member
         const apiRiskLevel = reportData.riskLevel;
         if (!Object.values(RiskLevel).includes(apiRiskLevel)) {
             console.warn(`Received invalid riskLevel: ${apiRiskLevel}. Defaulting to Amarillo.`);

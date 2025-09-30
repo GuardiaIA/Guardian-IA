@@ -7,9 +7,10 @@ import { ReportData, User, HierarchicalRole } from '../types';
 interface ScanViewProps {
   currentUser: User;
   onReportGenerated: (report: ReportData) => void;
+  apiKey: string;
 }
 
-const ScanView: React.FC<ScanViewProps> = ({ currentUser, onReportGenerated }) => {
+const ScanView: React.FC<ScanViewProps> = ({ currentUser, onReportGenerated, apiKey }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [location, setLocation] = useState('');
@@ -37,7 +38,7 @@ const ScanView: React.FC<ScanViewProps> = ({ currentUser, onReportGenerated }) =
     setError(null);
 
     try {
-      const report = await analyzeImageForSafety(imageFile, location);
+      const report = await analyzeImageForSafety(imageFile, location, apiKey);
       onReportGenerated({ 
           ...report, 
           imageUrl: URL.createObjectURL(imageFile), 

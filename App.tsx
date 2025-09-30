@@ -11,8 +11,10 @@ import UserGuideView from './components/UserGuideView';
 import { ReportData, User, RiskLevel, HierarchicalRole, View } from './types';
 import { MOCK_USERS } from './data/users';
 import { MOCK_REPORTS_DATA } from './data/mockReports';
+import ApiKeyView from './components/ApiKeyView';
 
 const App: React.FC = () => {
+  const [apiKey, setApiKey] = useState<string | null>(() => sessionStorage.getItem('gemini_api_key'));
   const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [reports, setReports] = useState<ReportData[]>([]);
@@ -39,6 +41,11 @@ const App: React.FC = () => {
     }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     setReports(initialReports);
   }, [users]);
+  
+  const handleApiKeySubmit = (key: string) => {
+    sessionStorage.setItem('gemini_api_key', key);
+    setApiKey(key);
+  };
 
   const handleLogin = (email: string, password: string):User | null => {
     const user = users.find(u => u.email === email && u.password === password);
@@ -96,6 +103,10 @@ const App: React.FC = () => {
       }
       setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
   }
+  
+  if (!apiKey) {
+    return <ApiKeyView onApiKeySubmit={handleApiKeySubmit} />;
+  }
 
   if (!currentUser) {
     return <LoginView onLogin={handleLogin} onAddNewUser={handleAddUser} />;
@@ -107,7 +118,7 @@ const App: React.FC = () => {
     }
     switch (activeView) {
       case 'scan':
-        return <ScanView currentUser={currentUser} onReportGenerated={handleReportGenerated} />;
+        return <ScanView currentUser={currentUser} onReportGenerated={handleReportGenerated} apiKey={apiKey} />;
       case 'history':
         return <HistoryView currentUser={currentUser} reports={reports} onSelectReport={handleSelectReport} />;
       case 'chemicals':
@@ -117,7 +128,7 @@ const App: React.FC = () => {
       case 'guide':
         return <UserGuideView />;
       default:
-        return <ScanView currentUser={currentUser} onReportGenerated={handleReportGenerated} />;
+        return <ScanView currentUser={currentUser} onReportGenerated={handleReportGenerated} apiKey={apiKey} />;
     }
   };
 
