@@ -77,12 +77,11 @@ export const analyzeImageForSafety = async (imageFile: File, location: string, a
             }
         });
 
-        const text = response.text;
-        if (!text) {
+        if (!response.text) {
             throw new Error("La respuesta de la API no contenía texto. Intente de nuevo.");
         }
         
-        const jsonString = text.trim();
+        const jsonString = response.text.trim();
         const reportData = JSON.parse(jsonString);
 
         const apiRiskLevel = reportData.riskLevel;
