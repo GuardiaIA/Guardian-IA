@@ -77,11 +77,11 @@ export const analyzeImageForSafety = async (imageFile: File, location: string, a
             }
         });
         
-        const jsonString = (response.text ?? '').trim();
-        
-        if (!jsonString) {
-            throw new Error("La respuesta de la API estaba vacía. Intente de nuevo.");
+        const text = response.text;
+        if (!text) {
+            throw new Error("La respuesta de la API estaba vacía o no contenía texto. Intente de nuevo.");
         }
+        const jsonString = text.trim();
         
         const reportData = JSON.parse(jsonString);
 
