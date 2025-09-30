@@ -38,7 +38,7 @@ Siga estos pasos para configurar y ejecutar el proyecto en su máquina local. El
 Este proyecto se puede desplegar fácilmente como un sitio estático en GitHub Pages.
 
 1.  **Crear un repositorio en GitHub:**
-    Cree un nuevo repositorio en GitHub. El nombre del repositorio debe coincidir con el valor de `base` en el archivo `vite.config.ts` (ej. `/guardian-ia/`).
+    Cree un nuevo repositorio en GitHub. El nombre del repositorio debe coincidir con el valor de `base` en el archivo `vite.config.ts` (ej. `/Guardian-IA/`). **¡Importante: El valor es sensible a mayúsculas y minúsculas!**
 
 2.  **Subir el código:**
     Suba todos los archivos del proyecto a su nuevo repositorio de GitHub.
